@@ -3,149 +3,208 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Repositorio Inteligente IA</title>
+  <title>Repositorio Técnico — Forestación Barahona</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: system-ui, sans-serif; background: #f8fafc; min-height: 100vh; }
-    .container { max-width: 860px; margin: 0 auto; padding: 16px; }
+    body { font-family: system-ui, sans-serif; background: #f0f4f1; min-height: 100vh; }
+    .container { max-width: 900px; margin: 0 auto; padding: 16px; }
 
+    /* ── Top bar con logo ── */
+    .topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      background: #1a3a2a; border-radius: 12px 12px 0 0;
+      padding: 12px 22px;
+    }
+    .logo-area { display: flex; align-items: center; gap: 14px; }
+    .logo-box {
+      width: 52px; height: 52px; border: 2px solid #4caf82;
+      border-radius: 6px; display: flex; align-items: center; justify-content: center;
+      flex-direction: column; background: #1a3a2a;
+    }
+    .logo-box .logo-sq {
+      width: 30px; height: 30px; border: 1.5px solid #fff;
+      border-bottom: none; border-right: none;
+      position: relative;
+    }
+    .logo-box .logo-sq::after {
+      content: '';
+      position: absolute; right: -8px; bottom: -8px;
+      width: 14px; height: 14px;
+      border: 1.5px solid #fff; border-top: none; border-left: none;
+    }
+    .logo-text { color: #fff; font-size: 17px; font-weight: 700; letter-spacing: 0.5px; }
+    .logo-sub { color: #4caf82; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; margin-top: 1px; }
+    .topbar-right { text-align: right; }
+    .topbar-right .label { color: #a5c9b5; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; }
+    .topbar-right .version { color: #fff; font-size: 12px; margin-top: 2px; }
+
+    /* ── Header principal ── */
     .header {
-      background: linear-gradient(135deg, #1e40af, #7c3aed);
-      border-radius: 14px; padding: 18px 24px; margin-bottom: 20px;
-      display: flex; justify-content: space-between; align-items: center;
+      background: linear-gradient(135deg, #1e5c3a, #2d7a52);
+      padding: 20px 24px; margin-bottom: 0;
+      border-left: 4px solid #4caf82;
     }
-    .header-title { color: #fff; font-size: 20px; font-weight: 700; }
-    .header-sub { color: #bfdbfe; font-size: 13px; margin-top: 2px; }
-    .btn-config {
-      background: rgba(255,255,255,0.15); border: none; border-radius: 8px;
-      color: #fff; font-size: 20px; padding: 6px 12px; cursor: pointer;
-    }
+    .project-label { color: #a5d6be; font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 4px; }
+    .project-title { color: #fff; font-size: 19px; font-weight: 700; line-height: 1.3; }
+    .project-meta { display: flex; gap: 20px; margin-top: 10px; flex-wrap: wrap; }
+    .meta-item { display: flex; flex-direction: column; }
+    .meta-label { color: #a5d6be; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; }
+    .meta-val { color: #fff; font-size: 13px; font-weight: 600; margin-top: 1px; }
 
+    /* ── Sub-header stats + config ── */
+    .subheader {
+      background: #163020; padding: 10px 22px;
+      display: flex; justify-content: space-between; align-items: center;
+      border-radius: 0 0 12px 12px; margin-bottom: 18px;
+    }
+    .subheader-stats { display: flex; gap: 20px; }
+    .sh-stat { color: #a5d6be; font-size: 12px; }
+    .sh-stat span { color: #fff; font-weight: 600; }
+    .btn-config {
+      background: rgba(76,175,130,0.2); border: 1px solid #4caf82;
+      border-radius: 7px; color: #4caf82; font-size: 13px;
+      padding: 5px 12px; cursor: pointer; font-weight: 600;
+    }
+    .btn-config:hover { background: rgba(76,175,130,0.3); }
+
+    /* ── Config ── */
     .config-panel {
-      background: #fff; border-radius: 12px; padding: 20px;
-      border: 1px solid #e2e8f0; margin-bottom: 16px; display: none;
+      background: #fff; border-radius: 10px; padding: 18px;
+      border: 1px solid #c8dfd1; margin-bottom: 14px; display: none;
     }
     .config-panel.visible { display: block; }
-    .config-title { font-weight: 600; color: #1e293b; margin-bottom: 8px; }
-    .config-desc { font-size: 13px; color: #64748b; margin-bottom: 10px; }
-    .config-desc a { color: #7c3aed; }
+    .config-title { font-weight: 700; color: #1e5c3a; margin-bottom: 6px; font-size: 14px; }
+    .config-desc { font-size: 12px; color: #64748b; margin-bottom: 10px; }
+    .config-desc a { color: #1e5c3a; }
     .key-row { display: flex; gap: 8px; }
-    .key-row input {
-      flex: 1; padding: 8px 12px; border-radius: 8px;
-      border: 1px solid #cbd5e1; font-size: 14px;
-    }
-    .btn-eye {
-      padding: 8px 12px; border-radius: 8px; border: 1px solid #cbd5e1;
-      background: #f1f5f9; cursor: pointer; font-size: 16px;
-    }
-    .key-ok { margin-top: 8px; color: #16a34a; font-size: 13px; }
+    .key-row input { flex: 1; padding: 8px 12px; border-radius: 7px; border: 1px solid #c8dfd1; font-size: 13px; }
+    .btn-eye { padding: 8px 12px; border-radius: 7px; border: 1px solid #c8dfd1; background: #f1f5f9; cursor: pointer; }
+    .key-ok { margin-top: 6px; color: #16a34a; font-size: 12px; }
 
-    .tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+    /* ── Tabs ── */
+    .tabs { display: flex; gap: 8px; margin-bottom: 14px; }
     .tab-btn {
-      padding: 9px 20px; border-radius: 10px; border: none;
-      font-weight: 600; font-size: 14px; cursor: pointer;
+      padding: 9px 20px; border-radius: 9px; border: 1px solid #c8dfd1;
+      font-weight: 600; font-size: 13px; cursor: pointer;
       background: #fff; color: #64748b;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
     }
-    .tab-btn.active { background: #1e40af; color: #fff; }
+    .tab-btn.active { background: #1e5c3a; color: #fff; border-color: #1e5c3a; }
 
     .panel { display: none; }
     .panel.visible { display: block; }
 
-    .upload-box {
-      background: #fff; border-radius: 12px; padding: 20px;
-      border: 1px solid #e2e8f0; margin-bottom: 16px;
-    }
+    /* ── Stats cards ── */
+    .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
+    .stat-card { background: #fff; border-radius: 10px; padding: 14px 16px; border: 1px solid #c8dfd1; border-top: 3px solid #2d7a52; }
+    .stat-label { font-size: 11px; color: #64748b; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-val { font-size: 22px; font-weight: 700; color: #1e5c3a; }
+
+    /* ── Upload ── */
+    .upload-box { background: #fff; border-radius: 10px; padding: 18px; border: 1px solid #c8dfd1; margin-bottom: 14px; }
+    .upload-box-title { font-weight: 700; color: #1e293b; margin-bottom: 10px; font-size: 14px; }
     .upload-label {
-      display: block; border: 2px dashed #7c3aed; border-radius: 10px;
-      padding: 24px; text-align: center; cursor: pointer;
-      background: #faf5ff; color: #7c3aed; font-weight: 600; font-size: 15px;
+      display: block; border: 2px dashed #2d7a52; border-radius: 9px;
+      padding: 22px; text-align: center; cursor: pointer;
+      background: #f0f9f4; color: #1e5c3a; font-weight: 600; font-size: 14px;
     }
-    .upload-label:hover { background: #f3e8ff; }
+    .upload-label:hover { background: #e0f2eb; }
 
-    .file-list { display: flex; flex-direction: column; gap: 10px; }
+    /* ── File list ── */
+    .file-list { display: flex; flex-direction: column; gap: 8px; }
     .file-item {
-      background: #fff; border-radius: 10px; padding: 14px 18px;
-      border: 1px solid #e2e8f0; display: flex;
-      justify-content: space-between; align-items: center;
+      background: #fff; border-radius: 9px; padding: 12px 16px;
+      border: 1px solid #c8dfd1; display: flex; justify-content: space-between; align-items: center;
     }
-    .file-name { font-weight: 600; color: #1e293b; font-size: 15px; }
-    .file-meta { font-size: 12px; color: #94a3b8; margin-top: 2px; }
-    .btn-del {
-      background: #fee2e2; border: none; border-radius: 7px;
-      padding: 6px 12px; color: #dc2626; cursor: pointer; font-weight: 600;
-    }
-    .empty { text-align: center; color: #94a3b8; padding: 40px; }
+    .file-item:hover { border-color: #2d7a52; }
+    .file-icon { font-size: 20px; margin-right: 10px; }
+    .file-info { display: flex; align-items: center; flex: 1; }
+    .file-name { font-weight: 600; color: #1e293b; font-size: 14px; }
+    .file-meta { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+    .btn-del { background: #fee2e2; border: none; border-radius: 6px; padding: 5px 11px; color: #dc2626; cursor: pointer; font-weight: 600; font-size: 12px; }
+    .empty { text-align: center; color: #94a3b8; padding: 36px; font-size: 14px; }
 
-    .stats-row {
-      display: grid; grid-template-columns: repeat(3, 1fr);
-      gap: 10px; margin-bottom: 16px;
-    }
-    .stat-card {
-      background: #fff; border-radius: 10px; padding: 14px 16px;
-      border: 1px solid #e2e8f0;
-    }
-    .stat-label { font-size: 12px; color: #94a3b8; margin-bottom: 4px; }
-    .stat-val { font-size: 22px; font-weight: 700; color: #1e293b; }
-
-    .chat-box {
-      background: #fff; border-radius: 12px;
-      border: 1px solid #e2e8f0; overflow: hidden;
-    }
-    .chat-messages {
-      height: 400px; overflow-y: auto; padding: 20px;
-      display: flex; flex-direction: column; gap: 12px;
-    }
+    /* ── Chat ── */
+    .chat-box { background: #fff; border-radius: 10px; border: 1px solid #c8dfd1; overflow: hidden; }
+    .chat-header { background: #1e5c3a; padding: 12px 18px; }
+    .chat-header-title { color: #fff; font-weight: 700; font-size: 14px; }
+    .chat-header-sub { color: #a5d6be; font-size: 11px; margin-top: 2px; }
+    .chat-messages { height: 390px; overflow-y: auto; padding: 18px; display: flex; flex-direction: column; gap: 12px; }
     .msg { display: flex; }
     .msg.user { justify-content: flex-end; }
-    .bubble {
-      max-width: 80%; padding: 10px 14px; font-size: 14px;
-      line-height: 1.5; white-space: pre-wrap;
-    }
-    .bubble.user {
-      background: #1e40af; color: #fff;
-      border-radius: 14px 14px 4px 14px;
-    }
-    .bubble.assistant {
-      background: #f1f5f9; color: #1e293b;
-      border-radius: 14px 14px 14px 4px;
-    }
-    .chat-input-row {
-      padding: 12px 16px; border-top: 1px solid #e2e8f0;
-      display: flex; gap: 8px;
-    }
-    .chat-input {
-      flex: 1; padding: 10px 14px; border-radius: 10px;
-      border: 1px solid #cbd5e1; font-size: 14px; outline: none;
-    }
-    .btn-send {
-      padding: 10px 18px; border-radius: 10px; border: none;
-      background: #1e40af; color: #fff; font-weight: 700;
-      cursor: pointer; font-size: 15px;
-    }
-    .btn-send:disabled { opacity: 0.5; cursor: not-allowed; }
+    .bubble { max-width: 80%; padding: 10px 14px; font-size: 13px; line-height: 1.55; white-space: pre-wrap; }
+    .bubble.user { background: #1e5c3a; color: #fff; border-radius: 14px 14px 4px 14px; }
+    .bubble.assistant { background: #f0f9f4; color: #1e293b; border-radius: 14px 14px 14px 4px; border: 1px solid #c8dfd1; }
+    .chat-input-row { padding: 12px 14px; border-top: 1px solid #c8dfd1; display: flex; gap: 8px; }
+    .chat-input { flex: 1; padding: 10px 13px; border-radius: 8px; border: 1px solid #c8dfd1; font-size: 13px; outline: none; }
+    .chat-input:focus { border-color: #2d7a52; }
+    .btn-send { padding: 10px 18px; border-radius: 8px; border: none; background: #1e5c3a; color: #fff; font-weight: 700; cursor: pointer; font-size: 15px; }
+    .btn-send:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* ── Footer ── */
+    .footer { text-align: center; margin-top: 16px; color: #94a3b8; font-size: 11px; }
+    .footer span { color: #2d7a52; font-weight: 600; }
   </style>
 </head>
 <body>
 <div class="container">
 
-  <!-- Header -->
-  <div class="header">
-    <div>
-      <div class="header-title">📂 Repositorio Inteligente</div>
-      <div class="header-sub" id="header-sub">0 documentos · 0 KB</div>
+  <!-- Top bar -->
+  <div class="topbar">
+    <div class="logo-area">
+      <!-- Logo Sustenting (recreado con CSS) -->
+      <div class="logo-box">
+        <div class="logo-sq"></div>
+      </div>
+      <div>
+        <div class="logo-text">Sustenting</div>
+        <div class="logo-sub">Building a more sustainable future</div>
+      </div>
     </div>
-    <button class="btn-config" onclick="toggleConfig()">⚙️</button>
+    <div class="topbar-right">
+      <div class="label">Sistema de Gestión Documental</div>
+      <div class="version">IT-2026-001 · Versión 1.0</div>
+    </div>
+  </div>
+
+  <!-- Header proyecto -->
+  <div class="header">
+    <div class="project-label">Propuesta Técnica en Ejecución</div>
+    <div class="project-title">Mantenimiento y Seguimiento Forestación Barahona — RCA N°083/2006</div>
+    <div class="project-meta">
+      <div class="meta-item">
+        <span class="meta-label">Mandante</span>
+        <span class="meta-val">Minera Valle Central S.A.</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Ubicación</span>
+        <span class="meta-val">Requínoa, VI Región</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Superficie</span>
+        <span class="meta-val">3,34 ha · 3 Rodales</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Período</span>
+        <span class="meta-val">Marzo 2026 — 2027</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Subheader -->
+  <div class="subheader">
+    <div class="subheader-stats">
+      <div class="sh-stat">Documentos: <span id="sh-docs">0</span></div>
+      <div class="sh-stat">Tamaño: <span id="sh-size">0 KB</span></div>
+      <div class="sh-stat">Palabras indexadas: <span id="sh-words">0</span></div>
+    </div>
+    <button class="btn-config" onclick="toggleConfig()">⚙ Configuración</button>
   </div>
 
   <!-- Config -->
   <div class="config-panel" id="config-panel">
     <div class="config-title">🔑 API Key de Anthropic</div>
-    <div class="config-desc">
-      Solo necesaria para pruebas locales. En Vercel la key va en las variables de entorno.
-      Obtén la tuya en <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a>.
-    </div>
+    <div class="config-desc">Solo requerida para pruebas locales. En Vercel se configura como variable de entorno segura. Obtén la tuya en <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a>.</div>
     <div class="key-row">
       <input type="password" id="api-key-input" placeholder="sk-ant-..." oninput="saveKey(this.value)" />
       <button class="btn-eye" onclick="toggleKeyVis()">👁️</button>
@@ -155,45 +214,55 @@
 
   <!-- Tabs -->
   <div class="tabs">
-    <button class="tab-btn active" id="tab-repo" onclick="switchTab('repo')">📁 Repositorio</button>
-    <button class="tab-btn" id="tab-chat" onclick="switchTab('chat')">💬 Consultar con IA</button>
+    <button class="tab-btn active" id="tab-repo" onclick="switchTab('repo')">📁 Repositorio Documental</button>
+    <button class="tab-btn" id="tab-chat" onclick="switchTab('chat')">💬 Asistente IA</button>
   </div>
 
   <!-- Repo Panel -->
   <div class="panel visible" id="panel-repo">
     <div class="stats-row">
-      <div class="stat-card"><div class="stat-label">Documentos</div><div class="stat-val" id="stat-docs">0</div></div>
+      <div class="stat-card"><div class="stat-label">Documentos cargados</div><div class="stat-val" id="stat-docs">0</div></div>
       <div class="stat-card"><div class="stat-label">Tamaño total</div><div class="stat-val" id="stat-size">0 KB</div></div>
       <div class="stat-card"><div class="stat-label">Palabras indexadas</div><div class="stat-val" id="stat-words">0</div></div>
     </div>
 
     <div class="upload-box">
-      <div style="font-weight:600;color:#1e293b;margin-bottom:12px;">Subir PDFs al repositorio</div>
+      <div class="upload-box-title">📤 Cargar documentos al repositorio</div>
       <label class="upload-label" id="upload-label">
         📄 Haz clic o arrastra PDFs aquí
         <input type="file" accept=".pdf" multiple id="file-input" style="display:none" onchange="handleUpload(this)" />
       </label>
     </div>
 
-    <div id="empty-msg" class="empty">No hay documentos aún. ¡Sube tu primer PDF!</div>
+    <div id="empty-msg" class="empty">No hay documentos cargados. Sube informes, registros o antecedentes técnicos del proyecto.</div>
     <div class="file-list" id="file-list"></div>
   </div>
 
   <!-- Chat Panel -->
   <div class="panel" id="panel-chat">
     <div class="chat-box">
+      <div class="chat-header">
+        <div class="chat-header-title">Asistente IA — Forestación Barahona</div>
+        <div class="chat-header-sub">Consulta sobre informes, monitoreos, estado de rodales, riego, y más</div>
+      </div>
       <div class="chat-messages" id="chat-messages">
         <div class="msg">
-          <div class="bubble assistant">Hola 👋 Soy tu asistente. Tengo acceso a los documentos del repositorio. Puedo resumirlos, extraer datos, responder preguntas y generar reportes. ¿En qué te ayudo?</div>
+          <div class="bubble assistant">Hola 👋 Soy el asistente del <strong>Repositorio Técnico Forestación Barahona</strong>.<br><br>Puedes consultarme sobre los documentos cargados: informes de monitoreo, censos forestales, estado del sistema de riego, avance del cronograma, cumplimiento RCA N°083/2006, y más.<br><br>¿En qué te puedo ayudar?</div>
         </div>
       </div>
       <div class="chat-input-row">
         <input class="chat-input" id="chat-input"
-          placeholder="Pregunta sobre tus documentos..."
+          placeholder="Ej: ¿Cuál es el estado del sistema de riego? / Resume el último informe..."
           onkeydown="if(event.key==='Enter') sendMessage()" />
         <button class="btn-send" id="btn-send" onclick="sendMessage()">➤</button>
       </div>
     </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <span>Sustenting Chile SpA</span> · Ingeniería y Sustentabilidad · Sistema de Gestión Documental v1.0<br>
+    Proyecto: Mantenimiento Forestación Barahona · Mandante: Minera Valle Central S.A.
   </div>
 
 </div>
@@ -201,7 +270,7 @@
   pdfjsLib.GlobalWorkerOptions.workerSrc =
     'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-  const DB_KEY = 'repo_ia_files';
+  const DB_KEY = 'repo_barahona_files';
   let files = [];
   try { files = JSON.parse(localStorage.getItem(DB_KEY) || '[]'); } catch {}
   let apiKey = localStorage.getItem('repo_ia_key') || '';
@@ -218,50 +287,48 @@
     configOpen = !configOpen;
     document.getElementById('config-panel').classList.toggle('visible', configOpen);
   }
-
   function saveKey(v) {
     apiKey = v.trim();
     localStorage.setItem('repo_ia_key', apiKey);
     document.getElementById('key-ok').style.display = apiKey ? 'block' : 'none';
   }
-
   function toggleKeyVis() {
     const inp = document.getElementById('api-key-input');
     inp.type = inp.type === 'password' ? 'text' : 'password';
   }
-
   function switchTab(t) {
-    ['repo', 'chat'].forEach(k => {
-      document.getElementById('panel-' + k).classList.toggle('visible', k === t);
-      document.getElementById('tab-' + k).classList.toggle('active', k === t);
+    ['repo','chat'].forEach(k => {
+      document.getElementById('panel-'+k).classList.toggle('visible', k===t);
+      document.getElementById('tab-'+k).classList.toggle('active', k===t);
     });
   }
 
   function fmt(b) {
-    return b > 1024 * 1024 ? (b / 1024 / 1024).toFixed(1) + ' MB' : (b / 1024).toFixed(0) + ' KB';
+    return b > 1024*1024 ? (b/1024/1024).toFixed(1)+' MB' : (b/1024).toFixed(0)+' KB';
   }
-
   function persist() { localStorage.setItem(DB_KEY, JSON.stringify(files)); }
 
   function renderFiles() {
     const list = document.getElementById('file-list');
     const empty = document.getElementById('empty-msg');
-    const totalSize = files.reduce((a, f) => a + f.size, 0);
-    const totalWords = files.reduce((a, f) => a + f.words, 0);
-    document.getElementById('header-sub').textContent =
-      `${files.length} documento${files.length !== 1 ? 's' : ''} · ${fmt(totalSize)}`;
-    document.getElementById('stat-docs').textContent = files.length;
-    document.getElementById('stat-size').textContent = fmt(totalSize);
-    document.getElementById('stat-words').textContent =
-      totalWords > 1000 ? (totalWords / 1000).toFixed(1) + 'k' : totalWords;
+    const total = files.reduce((a,f) => a+f.size, 0);
+    const words = files.reduce((a,f) => a+f.words, 0);
+    const wFmt = words > 1000 ? (words/1000).toFixed(1)+'k' : words;
+    ['sh-docs','stat-docs'].forEach(id => document.getElementById(id).textContent = files.length);
+    ['sh-size','stat-size'].forEach(id => document.getElementById(id).textContent = fmt(total));
+    ['sh-words','stat-words'].forEach(id => document.getElementById(id).textContent = wFmt);
+    document.getElementById('header-sub') && (document.getElementById('header-sub').textContent = `${files.length} documentos`);
 
-    if (!files.length) { empty.style.display = 'block'; list.innerHTML = ''; return; }
+    if (!files.length) { empty.style.display='block'; list.innerHTML=''; return; }
     empty.style.display = 'none';
     list.innerHTML = files.map(f => `
       <div class="file-item">
-        <div>
-          <div class="file-name">📄 ${f.name}</div>
-          <div class="file-meta">${fmt(f.size)} · ${f.date} · ${f.words} palabras extraídas</div>
+        <div class="file-info">
+          <span class="file-icon">📄</span>
+          <div>
+            <div class="file-name">${f.name}</div>
+            <div class="file-meta">${fmt(f.size)} · Cargado: ${f.date} · ${f.words} palabras extraídas</div>
+          </div>
         </div>
         <button class="btn-del" onclick="deleteFile('${f.id}')">Eliminar</button>
       </div>`).join('');
@@ -290,16 +357,10 @@
     const selected = Array.from(input.files);
     if (!selected.length) return;
     const lbl = document.getElementById('upload-label');
-    lbl.textContent = '⏳ Procesando...';
+    lbl.textContent = '⏳ Procesando documentos...';
     for (const f of selected) {
       const text = await extractPdfText(f);
-      files.push({
-        id: Date.now() + '' + Math.random(),
-        name: f.name, size: f.size,
-        date: new Date().toLocaleDateString('es-CL'),
-        words: text.split(' ').length,
-        text
-      });
+      files.push({ id: Date.now()+''+Math.random(), name: f.name, size: f.size, date: new Date().toLocaleDateString('es-CL'), words: text.split(' ').length, text });
     }
     persist(); renderFiles();
     lbl.innerHTML = '📄 Haz clic o arrastra PDFs aquí';
@@ -307,7 +368,7 @@
   }
 
   function deleteFile(id) {
-    if (!confirm('¿Eliminar este archivo del repositorio?')) return;
+    if (!confirm('¿Eliminar este documento del repositorio?')) return;
     files = files.filter(f => f.id !== id);
     persist(); renderFiles();
   }
@@ -316,7 +377,7 @@
     const chat = document.getElementById('chat-messages');
     const div = document.createElement('div');
     div.className = 'msg ' + role;
-    div.innerHTML = `<div class="bubble ${role}">${text.replace(/</g, '&lt;')}</div>`;
+    div.innerHTML = `<div class="bubble ${role}">${text.replace(/</g,'&lt;')}</div>`;
     chat.appendChild(div);
     chat.scrollTop = chat.scrollHeight;
     return div;
@@ -331,59 +392,41 @@
     thinking = true;
     document.getElementById('btn-send').disabled = true;
 
-    if (!apiKey && window.location.hostname === 'localhost') {
-      addBubble('assistant', '⚠️ Ingresa tu API Key en ⚙️ Configuración para pruebas locales.');
-      thinking = false;
-      document.getElementById('btn-send').disabled = false;
-      return;
+    if (!apiKey && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+      addBubble('assistant', '⚠️ Ingresa tu API Key en ⚙ Configuración para pruebas locales.');
+      thinking = false; document.getElementById('btn-send').disabled = false; return;
     }
 
     const context = files.length
-      ? files.map(f => `--- Documento: ${f.name} ---\n${f.text.slice(0, 3000)}`).join('\n\n')
-      : 'No hay documentos en el repositorio aún.';
+      ? files.map(f => `--- Documento: ${f.name} ---\n${f.text.slice(0,3000)}`).join('\n\n')
+      : 'No hay documentos cargados en el repositorio aún.';
 
-    const systemPrompt = `Eres un asistente de repositorio documental para equipos de trabajo. Tienes acceso al contenido de los siguientes documentos PDF:\n\n${context}\n\nResponde en español. Puedes resumir, extraer estadísticas, generar reportes y responder preguntas. Si algo no está en los documentos, indícalo claramente.`;
+    const systemPrompt = `Eres el asistente técnico del Repositorio Documental del proyecto "Mantenimiento y Seguimiento Forestación Barahona RCA N°083/2006", ejecutado por Sustenting Chile SpA para Minera Valle Central S.A. (MVC), ubicado en Requínoa, Sexta Región.\n\nEl proyecto contempla mantención y seguimiento de 3,34 hectáreas de forestación nativa en 3 rodales, incluyendo monitoreo forestal, sistema de riego, cerco perimetral, camino de acceso, y generación de informes técnicos mensuales y anuales.\n\nTienes acceso al contenido de los siguientes documentos del repositorio:\n\n${context}\n\nResponde siempre en español, de forma técnica y profesional. Puedes resumir documentos, extraer estadísticas, comparar períodos, generar reportes, responder preguntas sobre el estado de la forestación, riego, cumplimiento RCA, avance de actividades, y más. Si la información no está disponible en los documentos, indícalo claramente.`;
 
-    const thinkDiv = addBubble('assistant', '⏳ Procesando...');
+    const thinkDiv = addBubble('assistant', '⏳ Consultando repositorio...');
 
     try {
       const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
       let res;
-
       if (isLocal) {
         res = await fetch('https://api.anthropic.com/v1/messages', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey,
-            'anthropic-version': '2023-06-01',
-            'anthropic-dangerous-direct-browser-access': 'true'
-          },
-          body: JSON.stringify({
-            model: 'claude-sonnet-4-20250514',
-            max_tokens: 1000,
-            system: systemPrompt,
-            messages: [{ role: 'user', content: msg }]
-          })
+          headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+          body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 1000, system: systemPrompt, messages: [{ role: 'user', content: msg }] })
         });
       } else {
         res = await fetch('/api/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            messages: [{ role: 'user', content: msg }],
-            systemPrompt
-          })
+          body: JSON.stringify({ messages: [{ role: 'user', content: msg }], systemPrompt })
         });
       }
-
       const data = await res.json();
       const reply = data?.content?.[0]?.text || 'Sin respuesta.';
       thinkDiv.querySelector('.bubble').textContent = reply;
     } catch {
-      thinkDiv.querySelector('.bubble').textContent = '❌ Error de conexión. Verifica tu configuración.';
+      thinkDiv.querySelector('.bubble').textContent = '❌ Error de conexión. Verifica la configuración.';
     }
-
     thinking = false;
     document.getElementById('btn-send').disabled = false;
     document.getElementById('chat-messages').scrollTop = 99999;
