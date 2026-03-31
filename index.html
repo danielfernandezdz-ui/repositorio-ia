@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Repositorio Inteligente IA</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, sans-serif; background: #f8fafc; min-height: 100vh; }
+    .container { max-width: 860px; margin: 0 auto; padding: 16px; }
+
+    .header {
+      background: linear-gradient(135deg, #1e40af, #7c3aed);
+      border-radius: 14px; padding: 18px 24px; margin-bottom: 20px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .header-title { color: #fff; font-size: 20px; font-weight: 700; }
+    .header-sub { color: #bfdbfe; font-size: 13px; margin-top: 2px; }
+    .btn-config {
+      background: rgba(255,255,255,0.15); border: none; border-radius: 8px;
+      color: #fff; font-size: 20px; padding: 6px 12px; cursor: pointer;
+    }
+
+    .config-panel {
+      background: #fff; border-radius: 12px; padding: 20px;
+      border: 1px solid #e2e8f0; margin-bottom: 16px; display: none;
+    }
+    .config-panel.visible { display: block; }
+    .config-title { font-weight: 600; color: #1e293b; margin-bottom: 8px; }
+    .config-desc { font-size: 13px; color: #64748b; margin-bottom: 10px; }
+    .config-desc a { color: #7c3aed; }
+    .key-row { display: flex; gap: 8px; }
+    .key-row input {
+      flex: 1; padding: 8px 12px; border-radius: 8px;
+      border: 1px solid #cbd5e1; font-size: 14px;
+    }
+    .btn-eye {
+      padding: 8px 12px; border-radius: 8px; border: 1px solid #cbd5e1;
+      background: #f1f5f9; cursor: pointer; font-size: 16px;
+    }
+    .key-ok { margin-top: 8px; color: #16a34a; font-size: 13px; }
+
+    .tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+    .tab-btn {
+      padding: 9px 20px; border-radius: 10px; border: none;
+      font-weight: 600; font-size: 14px; cursor: pointer;
+      background: #fff; color: #64748b;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+    .tab-btn.active { background: #1e40af; color: #fff; }
+
+    .panel { display: none; }
+    .panel.visible { display: block; }
+
+    .upload-box {
+      background: #fff; border-radius: 12px; padding: 20px;
+      border: 1px solid #e2e8f0; margin-bottom: 16px;
+    }
+    .upload-label {
+      display: block; border: 2px dashed #7c3aed; border-radius: 10px;
+      padding: 24px; text-align: center; cursor: pointer;
+      background: #faf5ff; color: #7c3aed; font-weight: 600; font-size: 15px;
+    }
+    .upload-label:hover { background: #f3e8ff; }
+
+    .file-list { display: flex; flex-direction: column; gap: 10px; }
+    .file-item {
+      background: #fff; border-radius: 10px; padding: 14px 18px;
+      border: 1px solid #e2e8f0; display: flex;
+      justify-content: space-between; align-items: center;
+    }
+    .file-name { font-weight: 600; color: #1e293b; font-size: 15px; }
+    .file-meta { font-size: 12px; color: #94a3b8; margin-top: 2px; }
+    .btn-del {
+      background: #fee2e2; border: none; border-radius: 7px;
+      padding: 6px 12px; color: #dc2626; cursor: pointer; font-weight: 600;
+    }
+    .empty { text-align: center; color: #94a3b8; padding: 40px; }
+
+    .stats-row {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 10px; margin-bottom: 16px;
+    }
+    .stat-card {
+      background: #fff; border-radius: 10px; padding: 14px 16px;
+      border: 1px solid #e2e8f0;
+    }
+    .stat-label { font-size: 12px; color: #94a3b8; margin-bottom: 4px; }
+    .stat-val { font-size: 22px; font-weight: 700; color: #1e293b; }
+
+    .chat-box {
+      background: #fff; border-radius: 12px;
+      border: 1px solid #e2e8f0; overflow: hidden;
+    }
+    .chat-messages {
+      height: 400px; overflow-y: auto; padding: 20px;
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .msg { display: flex; }
+    .msg.user { justify-content: flex-end; }
+    .bubble {
+      max-width: 80%; padding: 10px 14px; font-size: 14px;
+      line-height: 1.5; white-space: pre-wrap;
+    }
+    .bubble.user {
+      background: #1e40af; color: #fff;
+      border-radius: 14px 14px 4px 14px;
+    }
+    .bubble.assistant {
+      background: #f1f5f9; color: #1e293b;
+      border-radius: 14px 14px 14px 4px;
+    }
+    .chat-input-row {
+      padding: 12px 16px; border-top: 1px solid #e2e8f0;
+      display: flex; gap: 8px;
+    }
+    .chat-input {
+      flex: 1; padding: 10px 14px; border-radius: 10px;
+      border: 1px solid #cbd5e1; font-size: 14px; outline: none;
+    }
+    .btn-send {
+      padding: 10px 18px; border-radius: 10px; border: none;
+      background: #1e40af; color: #fff; font-weight: 700;
+      cursor: pointer; font-size: 15px;
+    }
+    .btn-send:disabled { opacity: 0.5; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <div>
+      <div class="header-title">📂 Repositorio Inteligente</div>
+      <div class="header-sub" id="header-sub">0 documentos · 0 KB</div>
+    </div>
+    <button class="btn-config" onclick="toggleConfig()">⚙️</button>
+  </div>
+
+  <!-- Config -->
+  <div class="config-panel" id="config-panel">
+    <div class="config-title">🔑 API Key de Anthropic</div>
+    <div class="config-desc">
+      Solo necesaria para pruebas locales. En Vercel la key va en las variables de entorno.
+      Obtén la tuya en <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a>.
+    </div>
+    <div class="key-row">
+      <input type="password" id="api-key-input" placeholder="sk-ant-..." oninput="saveKey(this.value)" />
+      <button class="btn-eye" onclick="toggleKeyVis()">👁️</button>
+    </div>
+    <div class="key-ok" id="key-ok" style="display:none">✅ API Key guardada</div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab-btn active" id="tab-repo" onclick="switchTab('repo')">📁 Repositorio</button>
+    <button class="tab-btn" id="tab-chat" onclick="switchTab('chat')">💬 Consultar con IA</button>
+  </div>
+
+  <!-- Repo Panel -->
+  <div class="panel visible" id="panel-repo">
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-label">Documentos</div><div class="stat-val" id="stat-docs">0</div></div>
+      <div class="stat-card"><div class="stat-label">Tamaño total</div><div class="stat-val" id="stat-size">0 KB</div></div>
+      <div class="stat-card"><div class="stat-label">Palabras indexadas</div><div class="stat-val" id="stat-words">0</div></div>
+    </div>
+
+    <div class="upload-box">
+      <div style="font-weight:600;color:#1e293b;margin-bottom:12px;">Subir PDFs al repositorio</div>
+      <label class="upload-label" id="upload-label">
+        📄 Haz clic o arrastra PDFs aquí
+        <input type="file" accept=".pdf" multiple id="file-input" style="display:none" onchange="handleUpload(this)" />
+      </label>
+    </div>
+
+    <div id="empty-msg" class="empty">No hay documentos aún. ¡Sube tu primer PDF!</div>
+    <div class="file-list" id="file-list"></div>
+  </div>
+
+  <!-- Chat Panel -->
+  <div class="panel" id="panel-chat">
+    <div class="chat-box">
+      <div class="chat-messages" id="chat-messages">
+        <div class="msg">
+          <div class="bubble assistant">Hola 👋 Soy tu asistente. Tengo acceso a los documentos del repositorio. Puedo resumirlos, extraer datos, responder preguntas y generar reportes. ¿En qué te ayudo?</div>
+        </div>
+      </div>
+      <div class="chat-input-row">
+        <input class="chat-input" id="chat-input"
+          placeholder="Pregunta sobre tus documentos..."
+          onkeydown="if(event.key==='Enter') sendMessage()" />
+        <button class="btn-send" id="btn-send" onclick="sendMessage()">➤</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+<script>
+  pdfjsLib.GlobalWorkerOptions.workerSrc =
+    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+  const DB_KEY = 'repo_ia_files';
+  let files = [];
+  try { files = JSON.parse(localStorage.getItem(DB_KEY) || '[]'); } catch {}
+  let apiKey = localStorage.getItem('repo_ia_key') || '';
+  let thinking = false;
+  let configOpen = false;
+
+  window.onload = () => {
+    document.getElementById('api-key-input').value = apiKey;
+    if (apiKey) document.getElementById('key-ok').style.display = 'block';
+    renderFiles();
+  };
+
+  function toggleConfig() {
+    configOpen = !configOpen;
+    document.getElementById('config-panel').classList.toggle('visible', configOpen);
+  }
+
+  function saveKey(v) {
+    apiKey = v.trim();
+    localStorage.setItem('repo_ia_key', apiKey);
+    document.getElementById('key-ok').style.display = apiKey ? 'block' : 'none';
+  }
+
+  function toggleKeyVis() {
+    const inp = document.getElementById('api-key-input');
+    inp.type = inp.type === 'password' ? 'text' : 'password';
+  }
+
+  function switchTab(t) {
+    ['repo', 'chat'].forEach(k => {
+      document.getElementById('panel-' + k).classList.toggle('visible', k === t);
+      document.getElementById('tab-' + k).classList.toggle('active', k === t);
+    });
+  }
+
+  function fmt(b) {
+    return b > 1024 * 1024 ? (b / 1024 / 1024).toFixed(1) + ' MB' : (b / 1024).toFixed(0) + ' KB';
+  }
+
+  function persist() { localStorage.setItem(DB_KEY, JSON.stringify(files)); }
+
+  function renderFiles() {
+    const list = document.getElementById('file-list');
+    const empty = document.getElementById('empty-msg');
+    const totalSize = files.reduce((a, f) => a + f.size, 0);
+    const totalWords = files.reduce((a, f) => a + f.words, 0);
+    document.getElementById('header-sub').textContent =
+      `${files.length} documento${files.length !== 1 ? 's' : ''} · ${fmt(totalSize)}`;
+    document.getElementById('stat-docs').textContent = files.length;
+    document.getElementById('stat-size').textContent = fmt(totalSize);
+    document.getElementById('stat-words').textContent =
+      totalWords > 1000 ? (totalWords / 1000).toFixed(1) + 'k' : totalWords;
+
+    if (!files.length) { empty.style.display = 'block'; list.innerHTML = ''; return; }
+    empty.style.display = 'none';
+    list.innerHTML = files.map(f => `
+      <div class="file-item">
+        <div>
+          <div class="file-name">📄 ${f.name}</div>
+          <div class="file-meta">${fmt(f.size)} · ${f.date} · ${f.words} palabras extraídas</div>
+        </div>
+        <button class="btn-del" onclick="deleteFile('${f.id}')">Eliminar</button>
+      </div>`).join('');
+  }
+
+  async function extractPdfText(file) {
+    return new Promise(resolve => {
+      const reader = new FileReader();
+      reader.onload = async e => {
+        try {
+          const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(e.target.result) }).promise;
+          let text = '';
+          for (let i = 1; i <= Math.min(pdf.numPages, 20); i++) {
+            const page = await pdf.getPage(i);
+            const content = await page.getTextContent();
+            text += content.items.map(s => s.str).join(' ') + '\n';
+          }
+          resolve(text.trim() || '[PDF sin texto extraíble]');
+        } catch { resolve('[Error al leer el PDF]'); }
+      };
+      reader.readAsArrayBuffer(file);
+    });
+  }
+
+  async function handleUpload(input) {
+    const selected = Array.from(input.files);
+    if (!selected.length) return;
+    const lbl = document.getElementById('upload-label');
+    lbl.textContent = '⏳ Procesando...';
+    for (const f of selected) {
+      const text = await extractPdfText(f);
+      files.push({
+        id: Date.now() + '' + Math.random(),
+        name: f.name, size: f.size,
+        date: new Date().toLocaleDateString('es-CL'),
+        words: text.split(' ').length,
+        text
+      });
+    }
+    persist(); renderFiles();
+    lbl.innerHTML = '📄 Haz clic o arrastra PDFs aquí';
+    input.value = '';
+  }
+
+  function deleteFile(id) {
+    if (!confirm('¿Eliminar este archivo del repositorio?')) return;
+    files = files.filter(f => f.id !== id);
+    persist(); renderFiles();
+  }
+
+  function addBubble(role, text) {
+    const chat = document.getElementById('chat-messages');
+    const div = document.createElement('div');
+    div.className = 'msg ' + role;
+    div.innerHTML = `<div class="bubble ${role}">${text.replace(/</g, '&lt;')}</div>`;
+    chat.appendChild(div);
+    chat.scrollTop = chat.scrollHeight;
+    return div;
+  }
+
+  async function sendMessage() {
+    const inp = document.getElementById('chat-input');
+    const msg = inp.value.trim();
+    if (!msg || thinking) return;
+    inp.value = '';
+    addBubble('user', msg);
+    thinking = true;
+    document.getElementById('btn-send').disabled = true;
+
+    if (!apiKey && window.location.hostname === 'localhost') {
+      addBubble('assistant', '⚠️ Ingresa tu API Key en ⚙️ Configuración para pruebas locales.');
+      thinking = false;
+      document.getElementById('btn-send').disabled = false;
+      return;
+    }
+
+    const context = files.length
+      ? files.map(f => `--- Documento: ${f.name} ---\n${f.text.slice(0, 3000)}`).join('\n\n')
+      : 'No hay documentos en el repositorio aún.';
+
+    const systemPrompt = `Eres un asistente de repositorio documental para equipos de trabajo. Tienes acceso al contenido de los siguientes documentos PDF:\n\n${context}\n\nResponde en español. Puedes resumir, extraer estadísticas, generar reportes y responder preguntas. Si algo no está en los documentos, indícalo claramente.`;
+
+    const thinkDiv = addBubble('assistant', '⏳ Procesando...');
+
+    try {
+      const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      let res;
+
+      if (isLocal) {
+        res = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': apiKey,
+            'anthropic-version': '2023-06-01',
+            'anthropic-dangerous-direct-browser-access': 'true'
+          },
+          body: JSON.stringify({
+            model: 'claude-sonnet-4-20250514',
+            max_tokens: 1000,
+            system: systemPrompt,
+            messages: [{ role: 'user', content: msg }]
+          })
+        });
+      } else {
+        res = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            messages: [{ role: 'user', content: msg }],
+            systemPrompt
+          })
+        });
+      }
+
+      const data = await res.json();
+      const reply = data?.content?.[0]?.text || 'Sin respuesta.';
+      thinkDiv.querySelector('.bubble').textContent = reply;
+    } catch {
+      thinkDiv.querySelector('.bubble').textContent = '❌ Error de conexión. Verifica tu configuración.';
+    }
+
+    thinking = false;
+    document.getElementById('btn-send').disabled = false;
+    document.getElementById('chat-messages').scrollTop = 99999;
+  }
+</script>
+</body>
+</html>
